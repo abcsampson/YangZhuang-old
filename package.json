@@ -1,0 +1,24 @@
+{
+  "name": "YangZhuang",
+  "version": "1.0.0",
+  "description": "An orthography converter of the Yang Zhuang language",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abcsampson/YangZhuang.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abcsampson/YangZhuang/issues"
+  },
+  "homepage": "https://github.com/abcsampson/YangZhuang#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
