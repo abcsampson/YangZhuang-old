@@ -130,6 +130,7 @@ function tokenize(upperText) {
         normalNucleusMark,
         codaMark,
         toneMark,
+        original: upperText,
     };
 }
 
@@ -159,7 +160,6 @@ const InitialToInitial = {
 };
 
 const GlideToGlide = {
-    '': '',
     'I': Glide.J,
     'Y': Glide.J,
     'IY': Glide.J,
@@ -240,9 +240,31 @@ const ToneToTone = {
     'C': Tone.O,
 };
 
+const AllowGlideVInitialMarks = ['G', 'K', 'Q', 'H'];
+const GuiliuToneMarks = ['L', 'F', 'V', 'Q'];
 const ObstruentFinalMarks = ['P', 'T', 'K', 'B', 'D', 'G'];
 const VoicelessObstruentFinalMarks = ['P', 'T', 'K'];
 const PtShortVowelMarks = ['AE', 'EE', 'OE', 'UE'];
+
+function isVowelAlternationV(tokens) {
+    const {
+        initialMark,
+        glideMark,
+        specialNucleusMark,
+        normalNucleusMark,
+        original,
+    } = tokens;
+
+    if (original === 'KVAEN' || original === 'HVAEN') {
+        return true;
+    }
+
+    if (glideMark !== 'V' || (!specialNucleusMark.startsWith('A') && !normalNucleusMark.startsWith('A'))) {
+        return false;
+    }
+
+    return !AllowGlideVInitialMarks.includes(initialMark);
+}
 
 function analyze(tokens) {
     const {
@@ -254,9 +276,21 @@ function analyze(tokens) {
         toneMark,
     } = tokens;
 
+    let initial,
+        glide;
+
+    const isGuiliu = GuiliuToneMarks.includes(toneMark);
+
+    if (initialMark === 'N' && glideMark === 'Y' && !isGuiliu) {
+        initial = Initial.NG;
+        glide = Glide.J;
+    } else if (isVowelAlternationV(tokens)) {
+        glide = Glide.W_O;
+    }
+
     let result = {
-        initial: InitialToInitial[initialMark],
-        glide: GlideToGlide[glideMark],
+        initial: initial || InitialToInitial[initialMark],
+        glide: glide || GlideToGlide[glideMark],
     };
 
     if (specialNucleusMark) {
@@ -270,11 +304,17 @@ function analyze(tokens) {
             ...SpecialNucleusMap[specialNucleusMark],
         };
     } else {
+        let nucleus;
+
+        if (isGuiliu && normalNucleusMark === 'O') {
+            nucleus = Nucleus.O;
+        }
+
         result = {
             ...result,
-            nucleus: NucleusToNucleus[normalNucleusMark],
+            nucleus: nucleus || NucleusToNucleus[normalNucleusMark],
             coda: CodaToCoda[codaMark],
-        }
+        };
     }
 
     if (ObstruentFinalMarks.includes(codaMark)) {
@@ -296,7 +336,7 @@ function analyze(tokens) {
         result = {
             ...result,
             tone,
-        }
+        };
     } else {
         result = {
             ...result,

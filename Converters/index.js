@@ -22,7 +22,7 @@ function convert(from = Constants.OrthographyTitle.LIAO_2010, to = Constants.Ort
     }
 
     return generate(neutralize(query));
-};
+}
 
 
 module.exports = {

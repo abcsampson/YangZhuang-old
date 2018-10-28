@@ -20,5 +20,9 @@
   "homepage": "https://github.com/abcsampson/YangZhuang#readme",
   "dependencies": {
     "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.8.0",
+    "eslint-plugin-react": "^7.11.1"
   }
 }

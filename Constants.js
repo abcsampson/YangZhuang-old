@@ -31,6 +31,7 @@ const Initial = {
 const Glide = {
     J: 'J',
     W: 'W',
+    W_O: 'W_O', // O - AA alternation
 };
 
 const Nucleus = {
@@ -62,9 +63,17 @@ const Coda = {
 const Phonation = {
     '1A': '1A',
     '1U': '1U',
-    '1C': '1C',
     '1G': '1G',
     '2': '2',
+};
+
+const ToneCategory = {
+    A: 'A',
+    B: 'B',
+    C: 'C',
+    D: 'D',
+    G: 'G',
+    O: 'O',
 };
 
 const Tone = {
@@ -93,4 +102,5 @@ module.exports = {
     Coda,
     Phonation,
     Tone,
+    ToneCategory,
 };
