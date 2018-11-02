@@ -2,6 +2,16 @@ const Constants = require('./Constants');
 
 const { Initial, Glide, Nucleus, Coda, Phonation, Tone, ToneCategory } = Constants;
 
+function longestMatch(candidates, text) {
+    return candidates.reduce((acc, current) => {
+        if (text.startsWith(current) && current.length > acc.length) {
+            return current;
+        }
+
+        return acc;
+    }, '');
+}
+
 function getToneCategory(tone) {
     return tone[0];
 }
@@ -62,6 +72,7 @@ function isLowPhonation(phonation) {
 }
 
 module.exports = {
+    longestMatch,
     getToneCategory,
     isTaiTone,
     isGuiliuTone,

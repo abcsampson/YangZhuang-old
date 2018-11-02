@@ -91,7 +91,13 @@ const Tone = {
     G2: 'G2',
     G3: 'G3',
     G4: 'G4',
-    O: 'O',
+    R: 'R',
+    C: 'C',
+};
+
+const Dialect = {
+    DEBAO: 'DEBAO',
+    JINGXI: 'JINGXI',
 };
 
 module.exports = {
@@ -103,4 +109,5 @@ module.exports = {
     Phonation,
     Tone,
     ToneCategory,
+    Dialect,
 };

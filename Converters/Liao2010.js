@@ -1,6 +1,7 @@
 const Constants = require('../Constants');
+const Util = require('../Util');
 
-const { Initial, Glide, Nucleus, Coda, Phonation, Tone } = Constants;
+const { Initial, Glide, Nucleus, Coda, Dialect, Tone } = Constants;
 
 const SpecialPrefixes = ['IY', 'UV', 'IO', 'UE', 'UU'];
 const GlottalGlideMarks = ['I', 'U'];
@@ -11,7 +12,7 @@ const InitialMarks = [
     'Z', 'C', 'SL', 'R',
     'Y',
     'G', 'K', 'NG',
-    'V', 'H',
+    'V', 'H', 'Q',
 ];
 
 const GlideMarks = ['Y', 'V'];
@@ -24,16 +25,7 @@ const CodaMarks = ['I', 'U', 'M', 'N', 'NG', 'P', 'T', 'K', 'B', 'D', 'G'];
 const NonGlideCodaMarks = ['M', 'N', 'NG', 'P', 'T', 'K', 'B', 'D', 'G'];
 
 const ToneMarks = ['Z', 'J', 'X', 'S', 'H', 'L', 'F', 'V', 'Q', 'R', 'C'];
-
-function longestMatch(candidates, text) {
-    return candidates.reduce((acc, current) => {
-        if (text.startsWith(current) && current.length > acc.length) {
-            return current;
-        }
-
-        return acc;
-    }, '');
-}
+const PTLongVowelMark = ['\''];
 
 function tokenize(upperText) {
     let tail = upperText;
@@ -42,8 +34,8 @@ function tokenize(upperText) {
         specialNucleusMark = '',
         normalNucleusMark = '';
 
-    const specialPrefix = longestMatch(SpecialPrefixes, tail);
-    const glottalGlideMark = longestMatch(GlottalGlideMarks, tail);
+    const specialPrefix = Util.longestMatch(SpecialPrefixes, tail);
+    const glottalGlideMark = Util.longestMatch(GlottalGlideMarks, tail);
 
     if (specialPrefix) {
         switch (specialPrefix) {
@@ -57,8 +49,8 @@ function tokenize(upperText) {
                 break;
             case 'IO': {
                 const tempTail = tail.slice(2);
-                const nonGlideCodaMark = longestMatch(NonGlideCodaMarks, tempTail);
-                const toneMark = longestMatch(ToneMarks, tempTail);
+                const nonGlideCodaMark = Util.longestMatch(NonGlideCodaMarks, tempTail);
+                const toneMark = Util.longestMatch(ToneMarks, tempTail);
 
                 if (!tempTail || nonGlideCodaMark || toneMark) {
                     normalNucleusMark = 'IO';
@@ -72,7 +64,7 @@ function tokenize(upperText) {
             case 'UE':
             case 'UU': {
                 const tempTail = tail.slice(2);
-                const nonGlideCodaMark = longestMatch(NonGlideCodaMarks, tempTail);
+                const nonGlideCodaMark = Util.longestMatch(NonGlideCodaMarks, tempTail);
 
                 if (nonGlideCodaMark) {
                     normalNucleusMark = specialPrefix;
@@ -87,8 +79,8 @@ function tokenize(upperText) {
     } else if (glottalGlideMark) {
         initialMark = '';
         const tempTail = tail.slice(1);
-        const codaMark = longestMatch(CodaMarks, tempTail);
-        const toneMark = longestMatch(ToneMarks, tempTail);
+        const codaMark = Util.longestMatch(CodaMarks, tempTail);
+        const toneMark = Util.longestMatch(ToneMarks, tempTail);
 
         if (!tempTail || codaMark || toneMark) {
             normalNucleusMark = glottalGlideMark;
@@ -96,28 +88,31 @@ function tokenize(upperText) {
             glideMark = glottalGlideMark;
         }
     } else {
-        initialMark = longestMatch(InitialMarks, tail);
+        initialMark = Util.longestMatch(InitialMarks, tail);
         tail = tail.slice(initialMark.length);
 
-        glideMark = longestMatch(GlideMarks, tail);
+        glideMark = Util.longestMatch(GlideMarks, tail);
         tail = tail.slice(glideMark.length);
     }
 
     if (!normalNucleusMark) {
-        specialNucleusMark = longestMatch(SpecialNucleusMarks, tail);
+        specialNucleusMark = Util.longestMatch(SpecialNucleusMarks, tail);
         tail = tail.slice(specialNucleusMark.length);
 
         if (!specialNucleusMark) {
-            normalNucleusMark = longestMatch(NormalNucleusMarks, tail);
+            normalNucleusMark = Util.longestMatch(NormalNucleusMarks, tail);
             tail = tail.slice(normalNucleusMark.length);
         }
     }
 
-    const codaMark = longestMatch(CodaMarks, tail);
+    const codaMark = Util.longestMatch(CodaMarks, tail);
     tail = tail.slice(codaMark.length);
 
-    const toneMark = longestMatch(ToneMarks, tail);
+    const toneMark = Util.longestMatch(ToneMarks, tail);
     tail = tail.slice(toneMark.length);
+
+    const ptLongVowelMark = Util.longestMatch(PTLongVowelMark, tail);
+    tail = tail.slice(ptLongVowelMark.length);
 
     if (tail !== '') {
         return null;
@@ -130,12 +125,14 @@ function tokenize(upperText) {
         normalNucleusMark,
         codaMark,
         toneMark,
+        ptLongVowelMark,
         original: upperText,
     };
 }
 
 const InitialToInitial = {
     '': Initial.Q,
+    'Q': Initial.Q,
     'B': Initial.P,
     'P': Initial.P_A,
     'M': Initial.M,
@@ -190,7 +187,7 @@ const SpecialNucleusMap = {
         coda: Coda.W,
     },
     'OA': {
-        nucleus: Nucleus.O,
+        nucleus: Nucleus.AA,
         coda: '',
     },
 };
@@ -236,8 +233,8 @@ const ToneToTone = {
     'F': Tone.G2,
     'V': Tone.G3,
     'Q': Tone.G4,
-    'R': Tone.O,
-    'C': Tone.O,
+    'R': Tone.R,
+    'C': Tone.C,
 };
 
 const AllowGlideVInitialMarks = ['G', 'K', 'Q', 'H'];
@@ -254,6 +251,10 @@ function isVowelAlternationV(tokens) {
         normalNucleusMark,
         original,
     } = tokens;
+
+    if (specialNucleusMark === 'OA') {
+        return true;
+    }
 
     if (original === 'KVAEN' || original === 'HVAEN') {
         return true;
@@ -274,6 +275,7 @@ function analyze(tokens) {
         normalNucleusMark,
         codaMark,
         toneMark,
+        ptLongVowelMark,
     } = tokens;
 
     let initial,
@@ -324,7 +326,7 @@ function analyze(tokens) {
         }
 
         const voiceless = VoicelessObstruentFinalMarks.includes(codaMark);
-        const short = PtShortVowelMarks.includes(normalNucleusMark);
+        const short = ptLongVowelMark ? false : PtShortVowelMarks.includes(normalNucleusMark);
         let tone;
 
         if (voiceless) {
@@ -364,9 +366,9 @@ function neutralizeSyllable(syllable) {
 }
 
 function neutralize(text) {
-    const latinLetterRegex = /[a-zA-Z]+/g;
-    const nonTargets = text.split(latinLetterRegex);
-    const targets = text.match(latinLetterRegex).map((syllable) => neutralizeSyllable(syllable));
+    const allLetterRegex = /[A-Z']+/ig;
+    const nonTargets = text.split(allLetterRegex);
+    const targets = text.match(allLetterRegex).map((syllable) => neutralizeSyllable(syllable));
 
     let result = [];
 
@@ -380,7 +382,220 @@ function neutralize(text) {
     return result;
 }
 
+
+const InitialToMark = {
+    [Initial.P]: 'B',
+    [Initial.P_A]: 'P',
+    [Initial.B]: 'MB',
+    [Initial.M]: 'M',
+    [Initial.F]: 'F',
+    [Initial.T]: 'D',
+    [Initial.T_A]: 'T',
+    [Initial.D]: 'ND',
+    [Initial.N]: 'N',
+    [Initial.L]: 'L',
+    [Initial.C]: 'Z',
+    [Initial.C_A]: 'C',
+    [Initial.S]: 'S',
+    [Initial.SL]: 'SL',
+    [Initial.R]: 'R',
+    [Initial.J]: 'Y',
+    [Initial.K]: 'G',
+    [Initial.K_A]: 'K',
+    [Initial.NG]: 'NG',
+    [Initial.W]: 'V',
+    [Initial.Q]: '', // special handle QY, QW
+    [Initial.H]: 'H',
+};
+
+const GlideToMark = {
+    [Glide.J]: 'Y',
+    [Glide.W]: 'V',
+    [Glide.W_O]: 'V',
+};
+
+const ToneToMark = {
+    [Tone.A1]: '',
+    [Tone.A2]: 'Z',
+    [Tone.B1]: 'S',
+    [Tone.B2]: 'H',
+    [Tone.C1]: 'J',
+    [Tone.C2]: 'X',
+    [Tone.DL1]: '',
+    [Tone.DL2]: '',
+    [Tone.DS1]: '',
+    [Tone.DS2]: '',
+    [Tone.G1]: 'L',
+    [Tone.G2]: 'F',
+    [Tone.G3]: 'V',
+    [Tone.G4]: 'Q',
+    [Tone.R]: 'R',
+    [Tone.C]: 'C',
+};
+
+function getInitialAndGlide(neutralized, options) {
+    const {
+        initial,
+        glide,
+        nucleus,
+        coda,
+    } = neutralized;
+
+    let initialMark = InitialToMark[initial];
+
+    if (initial === Initial.NG && glide === Glide.J) {
+        initialMark = 'N';
+    }
+
+    let glideMark = GlideToMark[glide] || '';
+
+    if (initial === Initial.Q) {
+        if (options.version === 3) {
+            initialMark = 'Q';
+        } else {
+            const insertedY = (nucleus === Nucleus.OO && (
+                coda !== Coda.J && coda !== Coda.W
+            )) ? 'Y' : '';
+
+            switch (glide) {
+                case Glide.J:
+                    glideMark = `I${insertedY}`;
+                    break;
+                case Glide.W:
+                    glideMark = 'U';
+                    break;
+                default:
+                    glideMark = '';
+                    break;
+            }
+        }
+    }
+
+    if (glide === Glide.W_O && options.version === 1) {
+        glideMark = '';
+    }
+
+    return `${initialMark}${glideMark}`;
+}
+
+const NucleusToMark = {
+    [Nucleus.AA]: 'A',
+    [Nucleus.A]: 'AE',
+    [Nucleus.EE]: 'E',
+    [Nucleus.OE]: 'EO',
+    [Nucleus.I]: 'I',
+    [Nucleus.E]: 'EE',
+    [Nucleus.Y]: 'IO',
+    [Nucleus.OO]: 'O',
+    [Nucleus.O]: 'OE',
+    [Nucleus.UU]: 'U',
+    [Nucleus.U]: 'UE',
+    [Nucleus.EU]: 'W',
+};
+
+const CodaToMark = {
+    [Coda.J]: 'I',
+    [Coda.W]: 'U',
+    [Coda.M]: 'M',
+    [Coda.N]: 'N',
+    [Coda.NG]: 'NG',
+    [Coda.P]: ['P', 'B'],
+    [Coda.T]: ['T', 'D'],
+    [Coda.K]: ['K', 'G'],
+};
+
+function getRhyme(neutralized, options) {
+    const {
+        glide,
+        nucleus,
+        coda,
+        tone,
+    } = neutralized;
+
+    let surfaceNucleus = nucleus;
+
+    if (glide === Glide.W_O && options.version === 1) {
+        switch (options.dialect) {
+            case Dialect.JINGXI:
+                if (!coda) {
+                    surfaceNucleus = Nucleus.O;
+                }
+                break;
+            case Dialect.DEBAO:
+            default:
+                surfaceNucleus = Nucleus.O;
+                break;
+        }
+    }
+
+    let nucleusMark = NucleusToMark[surfaceNucleus];
+
+    if (!coda) {
+        if (surfaceNucleus === Nucleus.O) {
+            return Util.isGuiliuTone(tone) ? 'O' : 'OA';
+        }
+    }
+
+    if (coda === Coda.J) {
+        switch (surfaceNucleus) {
+            case Nucleus.A:
+                return 'AY';
+            case Nucleus.OE:
+                return 'EY';
+            case Nucleus.O:
+                return 'OY';
+        }
+    }
+
+    if (coda === Coda.W) {
+        switch (surfaceNucleus) {
+            case Nucleus.AA:
+                return 'AO';
+            case Nucleus.A:
+                return 'AU';
+        }
+    }
+
+    let codaMark = CodaToMark[coda] || '';
+
+    if (coda === Coda.P || coda === Coda.T || coda === Coda.K) {
+        codaMark = Util.isHighTone(tone) ? CodaToMark[coda][0] : CodaToMark[coda][1];
+
+        if (surfaceNucleus === Nucleus.U && (tone === Tone.DL1 || tone === Tone.DL2)) {
+            if (options.version >= 2) {
+                nucleusMark = 'UU';
+            } else {
+                codaMark = `${codaMark}'`;
+            }
+        }
+    }
+
+    return `${nucleusMark}${codaMark}`;
+}
+
+function generateSingle(neutralized, options) {
+    const {
+        tone,
+    } = neutralized;
+
+    return [
+        getInitialAndGlide(neutralized, options),
+        getRhyme(neutralized, options),
+        ToneToMark[tone],
+    ].join('');
+}
+
+function generate(neutralizedObjects, options = { version: 3 }) {
+    return neutralizedObjects.map((object) => {
+        if (typeof object === 'string') {
+            return object;
+        }
+
+        return generateSingle(object, options);
+    }).join('').toLowerCase();
+}
+
 module.exports = {
     neutralize,
-    generate: (diu) => (diu),
+    generate,
 };
