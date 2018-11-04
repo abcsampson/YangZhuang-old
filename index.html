@@ -1,0 +1,93 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <!--bootstrap CDN-->
+  <!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script-->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    textarea {font-size:16pt !important;}
+  </style>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+
+
+  <div class='container'>
+    <h2>Yang Zhuang Orthography Converter</h2>
+    <p>This tool converts between Liao and Lee orthography. The latter orthography has not been finalised and is subject to change.</p>
+  </div>
+  <hr />
+  <div id='searchAreaBox' class='container'>
+    <div id='searchAreaTitle' class='col-md-3'>
+        <h2>From</h2>
+        <select id="fromScheme">
+          <option value="liao">Liao (All versions)</option>
+          <option value="lee">Lee</option>
+        </select>
+        <input type='button' class='btn-warning' value='Clear' onclick='document.getElementById("inputBox").value=""'>
+    </div>
+    <div id='searchArea' class='col-md-9'>
+        <textarea id='inputBox' rows='5' class='form-control'>Loengz zongz gin kauj nyaengz luemz tous
+Zeengl-seenf gvei ious moyz lai-lai
+Nin leh haet yaiz hoyj slaek gouh
+Soenj kauj tauj rouh nin gvas daiz
+        </textarea>
+        <input id='convertButton' type='button' class='btn-success center' style='width:100%; font-size:18pt'  value='&#x2193; Convert &#x2193;' onclick='window.myAPI.triggerConvert()'>
+    </div>
+  </div>
+  <hr />
+  <div id='resultAreaBox' class='container'>
+      <div id='resultAreaTitle' class='col-md-3'>
+          <h2>To</h2>
+          <select id='toScheme'>
+            <option value="liao_2010_debao">Liao (2010 Debao Dialect)</option>
+            <option value="liao_2010_jingxi">Liao (2010 Jingxi Dialect)</option>
+            <option value="liao_2013">Liao (2013)</option>
+            <option value="liao_3">Liao (Version 3)</option>
+            <option value="lee" selected>Lee</option>
+          </select>
+          <input type='button' class='btn-warning' value='Clear' onclick='document.getElementById("resultDiacritics").value=""'>
+      </div>
+      <div id='resultArea' class='col-md-9'>
+          <div>
+          <textarea id='resultBox' rows='5' class='form-control'></textarea>
+          </div>
+      </div>
+  </div>
+
+
+  <script src="js/vendor/modernizr-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.3.1.min.js"><\/script>')</script>
+  <script src="js/plugins.js"></script>
+  <script data-main="js/app" src="js/require.js"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+</body>
+
+</html>
