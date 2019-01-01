@@ -1,0 +1,2 @@
+- Handle special cases: ndùh ndòh, ngwoan, khwoan, hoan
+- Ask if there is a special letter for DL tone schwa

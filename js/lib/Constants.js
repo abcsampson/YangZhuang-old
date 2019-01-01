@@ -1,5 +1,5 @@
 define({
-  
+
     Initial: {
         P: 'P',
         P_A: 'P_A',
@@ -95,5 +95,11 @@ define({
     Dialect: {
         DEBAO: 'DEBAO',
         JINGXI: 'JINGXI',
+    },
+
+    Format: {
+        ALL_CAPITAL: 'ALL_CAPITAL',
+        CAPITAL_INITIAL: 'CAPITAL_INITIAL',
+        ALL_SMALL: 'ALL_SMALL',
     },
 });

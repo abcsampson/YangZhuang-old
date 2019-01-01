@@ -1,6 +1,6 @@
 define(['Constants', 'Util'], function(Constants, Util) {
 
-    const { Initial, Glide, Nucleus, Coda, Dialect, Tone } = Constants;
+    const { Initial, Glide, Nucleus, Coda, Dialect, Tone, Format } = Constants;
 
     const SpecialPrefixes = ['IY', 'UV', 'IO', 'UE', 'UU'];
     const GlottalGlideMarks = ['I', 'U'];
@@ -17,7 +17,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
     const GlideMarks = ['Y', 'V'];
 
     // ueC, ioC
-    const SpecialNucleusMarks = ['AY', 'EY', 'OY', 'AO', 'AU', 'OA'];
+    const SpecialNucleusMarks = ['AY', 'EW', 'EY', 'AW', 'OY', 'AO', 'AU', 'OA'];
     const NormalNucleusMarks = ['A', 'AE', 'E', 'EO', 'I', 'EE', 'IO', 'O', 'OE', 'U', 'UE', 'UU', 'W'];
 
     const CodaMarks = ['I', 'U', 'M', 'N', 'NG', 'P', 'T', 'K', 'B', 'D', 'G'];
@@ -83,8 +83,10 @@ define(['Constants', 'Util'], function(Constants, Util) {
 
             if (!tempTail || codaMark || toneMark) {
                 normalNucleusMark = glottalGlideMark;
+                tail = tempTail;
             } else {
                 glideMark = glottalGlideMark;
+                tail = tempTail;
             }
         } else {
             initialMark = Util.longestMatch(InitialMarks, tail);
@@ -113,7 +115,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
         const ptLongVowelMark = Util.longestMatch(PTLongVowelMark, tail);
         tail = tail.slice(ptLongVowelMark.length);
 
-        if (tail !== '') {
+        if (tail !== '' || (!normalNucleusMark && !specialNucleusMark)) {
             return null;
         }
 
@@ -169,8 +171,16 @@ define(['Constants', 'Util'], function(Constants, Util) {
             nucleus: Nucleus.A,
             coda: Coda.J,
         },
+        'EW': {
+            nucleus: Nucleus.OE,
+            coda: Coda.J,
+        },
         'EY': {
             nucleus: Nucleus.OE,
+            coda: Coda.J,
+        },
+        'AW': {
+            nucleus: Nucleus.O,
             coda: Coda.J,
         },
         'OY': {
@@ -361,7 +371,17 @@ define(['Constants', 'Util'], function(Constants, Util) {
             return syllable;
         }
 
-        return neutralized;
+        let format = Format.ALL_SMALL;
+        if (syllable.length > 1 && syllable.toUpperCase() === syllable) {
+            format = Format.ALL_CAPITAL;
+        } else if (syllable[0].toUpperCase() === syllable[0]) {
+            format = Format.CAPITAL_INITIAL
+        }
+
+        return {
+            ...neutralized,
+            format,
+        };
     }
 
     function neutralize(text) {
@@ -455,13 +475,16 @@ define(['Constants', 'Util'], function(Constants, Util) {
                 const insertedY = (nucleus === Nucleus.OO && (
                     coda !== Coda.J && coda !== Coda.W
                 )) ? 'Y' : '';
+                const insertedV = (nucleus === Nucleus.EE && (
+                    coda && coda !== Coda.J && coda !== Coda.W
+                )) ? 'V' : '';
 
                 switch (glide) {
                     case Glide.J:
                         glideMark = `I${insertedY}`;
                         break;
                     case Glide.W:
-                        glideMark = 'U';
+                        glideMark = `U${insertedV}`;
                         break;
                     default:
                         glideMark = '';
@@ -538,15 +561,15 @@ define(['Constants', 'Util'], function(Constants, Util) {
         if (coda === Coda.J) {
             switch (surfaceNucleus) {
                 case Nucleus.A:
-                    return 'AY';
+                    return (options.version === 3 ? 'AEI' : 'AY');
                 case Nucleus.OE:
-                    return 'EY';
+                    return (options.version === 3 ? 'EW' : 'EY');
                 case Nucleus.O:
-                    return 'OY';
+                    return (options.version === 3 ? 'AW' : 'OY');
             }
         }
 
-        if (coda === Coda.W) {
+        if (options.version < 3 && coda === Coda.W) {
             switch (surfaceNucleus) {
                 case Nucleus.AA:
                     return 'AO';
@@ -567,6 +590,14 @@ define(['Constants', 'Util'], function(Constants, Util) {
                     codaMark = `${codaMark}'`;
                 }
             }
+
+            if (surfaceNucleus === Nucleus.E && (tone === Tone.DL1 || tone === Tone.DL2)) {
+                if (options.version >= 2) {
+                    nucleusMark = 'IE';
+                } else {
+                    codaMark = `${codaMark}'`;
+                }
+            }
         }
 
         return `${nucleusMark}${codaMark}`;
@@ -575,13 +606,24 @@ define(['Constants', 'Util'], function(Constants, Util) {
     function generateSingle(neutralized, options) {
         const {
             tone,
+            format,
         } = neutralized;
 
-        return [
+        const string = [
             getInitialAndGlide(neutralized, options),
             getRhyme(neutralized, options),
             ToneToMark[tone],
         ].join('');
+
+        switch (format) {
+            case Format.ALL_CAPITAL:
+                return string.toUpperCase();
+            case Format.CAPITAL_INITIAL:
+                return string[0].toUpperCase() + string.slice(1).toLowerCase();
+            case Format.ALL_SMALL:
+            default:
+                return string.toLowerCase();
+        }
     }
 
     function generate(neutralizedObjects, options = { version: 3 }) {
@@ -591,7 +633,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
             }
 
             return generateSingle(object, options);
-        }).join('').toLowerCase();
+        }).join('');
     }
 
     function createGenerator(options) {

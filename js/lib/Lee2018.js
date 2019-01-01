@@ -1,10 +1,10 @@
 define(['Constants', 'Util'], function(Constants, Util) {
 
-    const { Initial, Glide, Nucleus, Coda, Tone, ToneCategory } = Constants;
+    const { Initial, Glide, Nucleus, Coda, Tone, ToneCategory, Format } = Constants;
 
     const InitialMarks = [
         'B', 'P', 'PH', 'M', 'MH', 'MB', 'F', 'V',
-        'D', 'T', 'TH', 'N', 'NH', 'ND', 'L', 'LH', 'S',
+        'D', 'T', 'TH', 'N', 'NH', 'ND', 'L', 'LH', 'S', 'Z',
         'J', 'C', 'CH', 'SL', 'ZL', 'R', 'RH',
         'Y', 'YH',
         'G', 'K', 'KH', 'NG', 'NGH',
@@ -13,7 +13,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
 
     const GlideMarks = ['Y', 'W', 'OA'];
 
-    const NucleusMarks = ['AA', 'A', 'EE', 'E', 'EU', 'I', 'OO', 'O', 'OE', 'UU', 'U', 'UO', 'UE'];
+    const NucleusMarks = ['AA', 'A', 'EE', 'E', 'IE', 'UI', 'I', 'OO', 'O', 'OE', 'UU', 'U', 'OU', 'OI'];
 
     const CodaMarks = ['Y', 'W', 'M', 'N', 'NG', 'P', 'T', 'K'];
 
@@ -21,6 +21,10 @@ define(['Constants', 'Util'], function(Constants, Util) {
     const WordToneMarks = ['R', 'C', 'H'];
 
     const allVowelLetters = 'AÀÁÂEÈÉÊIÌÍÎOÒÓÔUÙÚÛ';
+    const graveAccent = String.fromCharCode(0x300);
+    const acuteAccent = String.fromCharCode(0x301);
+    const circumflex = String.fromCharCode(0x302);
+    const allDiacritics = [graveAccent, acuteAccent, circumflex].join('');
 
     function separateToneMark(upperText) {
         let vowelToneMark = '',
@@ -28,12 +32,15 @@ define(['Constants', 'Util'], function(Constants, Util) {
 
         for (let i = 0; i < upperText.length; i++) {
             const index = allVowelLetters.indexOf(upperText[i]);
+            const diacriticIndex = allDiacritics.indexOf(upperText[i]);
 
             if (index > -1) {
                 const toneMarkIndex = index % 4;
 
                 vowelToneMark = vowelToneMark || VowelToneMarks[toneMarkIndex];
                 tail += allVowelLetters[index - toneMarkIndex];
+            } else if (diacriticIndex > -1) {
+                vowelToneMark = vowelToneMark || VowelToneMarks[diacriticIndex + 1];
             } else {
                 tail += upperText[i];
             }
@@ -104,6 +111,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
         'L': Initial.L,
         'LH': Initial.L,
         'S': Initial.S,
+        'Z': Initial.S,
         'J': Initial.C,
         'C': Initial.C,
         'CH': Initial.C_A,
@@ -123,7 +131,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
         'H': Initial.H,
     };
 
-    const VoicedInitialMarks = ['B', 'M', 'V', 'D', 'N', 'L', 'ZL', 'J', 'R', 'Y', 'G', 'NG', 'W'];
+    const VoicedInitialMarks = ['B', 'M', 'V', 'D', 'N', 'L', 'Z', 'ZL', 'J', 'R', 'Y', 'G', 'NG', 'W'];
     const ObstruentFinalMarks = ['P', 'T', 'K'];
     const PtShortVowelMarks = ['A', 'E', 'O', 'U'];
 
@@ -140,13 +148,14 @@ define(['Constants', 'Util'], function(Constants, Util) {
         'OE': Nucleus.OE,
         'I': Nucleus.I,
         'E': Nucleus.E,
-        'UE': Nucleus.Y,
+        'IE': Nucleus.E,
+        'OI': Nucleus.Y,
         'OO': Nucleus.OO,
         'O': Nucleus.O,
         'UU': Nucleus.UU,
         'U': Nucleus.U,
-        'UO': Nucleus.U,
-        'EU': Nucleus.EU,
+        'OU': Nucleus.U,
+        'UI': Nucleus.EU,
     };
 
     const CodaToCoda = {
@@ -171,12 +180,14 @@ define(['Constants', 'Util'], function(Constants, Util) {
         '': Tone.A1,
         '`': Tone.B1,
         '\'': Tone.C1,
+        '^': Tone.A2,
     };
 
     const LowToneToTone = {
         '': Tone.A2,
         '`': Tone.B2,
         '\'': Tone.C2,
+        '^': Tone.A2,
     };
 
     function analyze(tokens) {
@@ -243,10 +254,6 @@ define(['Constants', 'Util'], function(Constants, Util) {
             }
         }
 
-        if (original === 'OW') {
-            tone = Tone.A2;
-        }
-
         return {
             initial,
             glide,
@@ -269,11 +276,22 @@ define(['Constants', 'Util'], function(Constants, Util) {
             return syllable;
         }
 
-        return neutralized;
+        let format = Format.ALL_SMALL;
+        const visualLength = syllable.replace(new RegExp(`[${allDiacritics}]`, 'g'), (diacritic) => '').length;
+        if (visualLength > 1 && syllable.toUpperCase() === syllable) {
+            format = Format.ALL_CAPITAL;
+        } else if (syllable[0].toUpperCase() === syllable[0]) {
+            format = Format.CAPITAL_INITIAL
+        }
+
+        return {
+            ...neutralized,
+            format,
+        };
     }
 
     function neutralize(text) {
-        const allLetterRegex = new RegExp(`[A-Z${allVowelLetters}]+`, 'ig');
+        const allLetterRegex = new RegExp(`[A-Z${allVowelLetters}${allDiacritics}]+`, 'ig');
         const nonTargets = text.split(allLetterRegex);
         const targets = text.match(allLetterRegex).map((syllable) => neutralizeSyllable(syllable));
 
@@ -303,7 +321,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
         [Initial.L]: ['LH', 'L'],
         [Initial.C]: ['C', 'J'],
         [Initial.C_A]: ['CH', 'CH'],
-        [Initial.S]: ['S', 'S'],
+        [Initial.S]: ['S', 'Z'],
         [Initial.SL]: ['SL', 'ZL'],
         [Initial.R]: ['RH', 'R'],
         [Initial.J]: ['YH', 'Y'],
@@ -361,12 +379,12 @@ define(['Constants', 'Util'], function(Constants, Util) {
         [Nucleus.OE]: 'OE',
         [Nucleus.I]: 'I',
         [Nucleus.E]: 'E',
-        [Nucleus.Y]: 'UE',
+        [Nucleus.Y]: 'OI',
         [Nucleus.OO]: 'OO',
         [Nucleus.O]: 'O',
         [Nucleus.UU]: 'UU',
         [Nucleus.U]: 'U',
-        [Nucleus.EU]: 'EU',
+        [Nucleus.EU]: 'UI',
     };
 
     const CodaToMark = {
@@ -409,7 +427,10 @@ define(['Constants', 'Util'], function(Constants, Util) {
             }
         } else if (coda === Coda.P || coda === Coda.T || coda === Coda.K) {
             if (nucleus === Nucleus.U && (tone === Tone.DL1 || tone === Tone.DL2)) {
-                nucleusMark = 'UO';
+                nucleusMark = 'OU';
+            }
+            if (nucleus === Nucleus.E && (tone === Tone.DL1 || tone === Tone.DL2)) {
+                nucleusMark = 'IE';
             }
         }
 
@@ -423,6 +444,16 @@ define(['Constants', 'Util'], function(Constants, Util) {
         'O': 'OÒÓÔ',
         'U': 'UÙÚÛ',
     };
+
+    function writeToneMarkOnVowel(toneless, toneMarkIndex) {
+        return toneless.replace(/[AEIOU]+/, (vowelSequence) => {
+            if (vowelSequence.length === 2 && vowelSequence[0] !== vowelSequence[1]) {
+                return `${vowelSequence[0]}${VowelMarkToTonedVowelMark[vowelSequence[1]][toneMarkIndex]}`;
+            }
+
+            return `${VowelMarkToTonedVowelMark[vowelSequence[0]][toneMarkIndex]}${vowelSequence.slice(1)}`;
+        });
+    }
 
     function writeToneMark(toneless, tone) {
         if (tone === Tone.R) {
@@ -450,7 +481,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
                     break;
             }
 
-            return toneless.replace(/[AEIOU]/, (vowelMark) => VowelMarkToTonedVowelMark[vowelMark][toneMarkIndex]);
+            return writeToneMarkOnVowel(toneless, toneMarkIndex);
         }
 
         let toneMarkIndex;
@@ -469,13 +500,14 @@ define(['Constants', 'Util'], function(Constants, Util) {
                 break;
         }
 
-        return `${toneless.replace(/[AEIOU]/, (vowelMark) => VowelMarkToTonedVowelMark[vowelMark][toneMarkIndex])}H`;
+        return `${writeToneMarkOnVowel(toneless, toneMarkIndex)}H`;
     }
 
     function generateSingle(neutralized) {
         const {
             glide,
             tone,
+            format,
         } = neutralized;
 
         const toneless = [
@@ -484,7 +516,17 @@ define(['Constants', 'Util'], function(Constants, Util) {
             getRhyme(neutralized),
         ].join('');
 
-        return writeToneMark(toneless, tone);
+        const string = writeToneMark(toneless, tone);
+
+        switch (format) {
+            case Format.ALL_CAPITAL:
+                return string.toUpperCase();
+            case Format.CAPITAL_INITIAL:
+                return string[0].toUpperCase() + string.slice(1).toLowerCase();
+            case Format.ALL_SMALL:
+            default:
+                return string.toLowerCase();
+        }
     }
 
     function generate(neutralizedObjects) {
@@ -494,7 +536,7 @@ define(['Constants', 'Util'], function(Constants, Util) {
             }
 
             return generateSingle(object);
-        }).join('').toLowerCase();
+        }).join('');
     }
 
     return {

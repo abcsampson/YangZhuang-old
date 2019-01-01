@@ -58,8 +58,13 @@ define(['Lee2018', 'Liao2010'], function(Lee2018, Liao2010) {
 
     testLiao2010(debao, { version: 1 });
 
+    testLiao2010('ij, iu', { version: 1 });
     testLiao2010('ue iyo ious', { version: 1 });
     testLiao2010('lueg\' slao', { version: 1 });
+    testLiao2010('meed\'', { version: 1 });
+    testLiao2010('saed', { version: 1 });
+    testLiao2010('mbios', { version: 1 });
+    testLiao2010('qaw qew', { version: 3 });
 
     function testLeeToLiao(inputString, options, expected) {
         const string = inputString.toLowerCase();
@@ -87,7 +92,7 @@ define(['Lee2018', 'Liao2010'], function(Lee2018, Liao2010) {
     testLeeToLiao('phoan', { version: 1, dialect: 'DEBAO' }, 'poen');
     testLeeToLiao('phoan', { version: 1, dialect: 'JINGXI' }, 'paen');
     testLeeToLiao('phoan', { version: 2 }, 'pvaen');
-    testLeeToLiao('luok', { version: 1 }, 'lueg\'');
-    testLeeToLiao('luok', { version: 2 }, 'luug');
-
+    testLeeToLiao('louk', { version: 1 }, 'lueg\'');
+    testLeeToLiao('louk', { version: 2 }, 'luug');
+    testLeeToLiao('zloáay', { version: 2 }, 'slvaix');
 });

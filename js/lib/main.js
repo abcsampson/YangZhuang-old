@@ -4,7 +4,7 @@ define(['Lee2018', 'Liao2010', 'Constants', 'test'], function(Lee2018, Liao2010,
         'liao': Liao2010.neutralize,
         'lee': Lee2018.neutralize,
     };
-    const Generaters = {
+    const Generators = {
         'lee': Lee2018.generate,
         'liao_2010_debao': Liao2010.createGenerator({ version: 1, dialect: Dialect.DEBAO }),
         'liao_2010_jingxi': Liao2010.createGenerator({ version: 1, dialect: Dialect.JINGXI }),
@@ -14,7 +14,7 @@ define(['Lee2018', 'Liao2010', 'Constants', 'test'], function(Lee2018, Liao2010,
 
     function convert(from, to, value) {
         const neutralize = Neutralizers[from];
-        const generate = Generaters[to];
+        const generate = Generators[to];
 
         return generate(neutralize(value));
     }

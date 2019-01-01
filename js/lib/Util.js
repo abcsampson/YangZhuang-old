@@ -47,7 +47,7 @@ define(['Constants'], function(Constants) {
         [Initial.L]: [Phonation['1U'], Phonation['2']],
         [Initial.C]: [Phonation['1U'], Phonation['2']],
         [Initial.C_A]: [Phonation['1A']],
-        [Initial.S]: [Phonation['1A']],
+        [Initial.S]: [Phonation['1A'], Phonation['2']],
         [Initial.SL]: [Phonation['1U'], Phonation['2']],
         [Initial.R]: [Phonation['1U'], Phonation['2']],
         [Initial.J]: [Phonation['1U'], Phonation['2']],
