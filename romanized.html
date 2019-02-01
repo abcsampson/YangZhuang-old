@@ -1,0 +1,322 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Yang Zhuang Orthography Converter</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+
+  <!--bootstrap CDN-->
+  <!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script-->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    textarea {font-size:16pt !important;}
+  </style>
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+
+
+  <div class='container'>
+    <h2>Yang Zhuang Orthography Converter</h2>
+    <p>This tool converts between Liao and Lee orthography. The latter orthography has not been finalised and is subject to change.</p>
+    <ul class="nav nav-tabs">
+      <li role="presentation"><a href="index.html">Converter</a></li>
+      <li role="presentation" class="active"><a >Documentation</a></li>
+    </ul>
+  </div>
+  <hr />
+  <div class='container'>
+    <h2 id="initials">Initials</h2>
+    <table class='table'>
+      <thead>
+        <tr>
+          <th>IPA</th>
+          <th>Letter</th>
+          <th>Consonantal Class</th>
+          <th>Example</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="danger">
+          <th rowspan='2'>p</th>
+          <th>p</th>
+          <th>1U</th>
+          <th>pay</th>
+          <th>to go</th>
+        </tr>
+        <tr class="info">
+          <th>b</th>
+          <th>2</th>
+          <th>ba</th>
+          <th>wife</th>
+        </tr>
+        <tr class="warning">
+          <th>pʰ</th>
+          <th>ph</th>
+          <th>1A</th>
+          <th>phon</th>
+          <th>rain</th>
+        </tr>
+        <tr class="success">
+          <th>ˀb/ɓ (m)</th>
+          <th>mb</th>
+          <th>1G</th>
+          <th>mbàaw</th>
+          <th>male</th>
+        </tr>
+        <tr>
+          <th rowspan="2">m</th>
+          <th>m</th>
+          <th>2</th>
+          <th>ma</th>
+          <th>to come</th>
+        </tr>
+        <tr>
+          <th>mh</th>
+          <th>1U</th>
+          <th>mha</th>
+          <th>dog</th>
+        </tr>
+        <tr>
+          <th rowspan="2">f</th>
+          <th>f</th>
+          <th>1U</th>
+          <th>fan</th>
+          <th>cent</th>
+        </tr>
+        <tr>
+          <th>v</th>
+          <th>2</th>
+          <th>vay</th>
+          <th>fire</th>
+        </tr>
+        <tr>
+          <th rowspan="2">t</th>
+          <th>t</th>
+          <th>1U</th>
+          <th>tóy</th>
+          <th>under</th>
+        </tr>
+        <tr>
+          <th>d</th>
+          <th>2</th>
+          <th>dèy</th>
+          <th>a place</th>
+        </tr>
+        <tr>
+          <th>tʰ</th>
+          <th>th</th>
+          <th>1A</th>
+          <th>thang</th>
+          <th>to arrive</th>
+        </tr>
+        <tr>
+          <th>ˀd/ɗ (n)</th>
+          <th>nd</th>
+          <th>1G</th>
+          <th>nday</th>
+          <th>good</th>
+        </tr>
+        <tr>
+          <th rowspan="2">n</th>
+          <th>n</th>
+          <th>2</th>
+          <th>na</th>
+          <th>field</th>
+        </tr>
+        <tr>
+          <th>nh</th>
+          <th>1U</th>
+          <th>nha</th>
+          <th>thick</th>
+        </tr>
+        <tr>
+          <th rowspan="2">l</th>
+          <th>l</th>
+          <th>2</th>
+          <th>laay</th>
+          <th>to write, pattern</th>
+        </tr>
+        <tr>
+          <th>lh</th>
+          <th>1U</th>
+          <th>lhaay</th>
+          <th>many</th>
+        </tr>
+        <tr>
+          <th rowspan="2">ɹ̥/ɹ/ð (l)</th>
+          <th>r</th>
+          <th>2</th>
+          <th>roy</th>
+          <th>which</th>
+        </tr>
+        <tr>
+          <th>rh</th>
+          <th>1U</th>
+          <th>rhang</th>
+          <th>what</th>
+        </tr>
+        <tr>
+          <th rowspan="2">ɬ/θ</th>
+          <th>sl</th>
+          <th>1U</th>
+          <th>slaaw</th>
+          <th>female</th>
+        </tr>
+        <tr>
+          <th>zl</th>
+          <th>2</th>
+          <th>zloéy</th>
+          <th>to buy</th>
+        </tr>
+        <tr>
+          <th rowspan="2">t͡s/t͡ɕ</th>
+          <th>c</th>
+          <th>1U</th>
+          <th>ców</th>
+          <th>to touch</th>
+        </tr>
+        <tr>
+          <th>j</th>
+          <th>2</th>
+          <th>joèy</th>
+          <th>to be</th>
+        </tr>
+        <tr>
+          <th rowspan="2">s/ɕ</th>
+          <th>s</th>
+          <th>1A</th>
+          <th>sat</th>
+          <th>paint</th>
+        </tr>
+        <tr>
+          <th>z</th>
+          <th>2</th>
+          <th>zat</th>
+          <th>actual, tight</th>
+        </tr>
+        <tr>
+          <th rowspan="2">k</th>
+          <th>k</th>
+          <th>1U</th>
+          <th>kày</th>
+          <th>chicken</th>
+        </tr>
+        <tr>
+          <th>g</th>
+          <th>2</th>
+          <th>gòw</th>
+          <th>pair</th>
+        </tr>
+        <tr>
+          <th>kʰ</th>
+          <th>kh</th>
+          <th>1A</th>
+          <th>kha</th>
+          <th>leg</th>
+        </tr>
+        <tr>
+          <th rowspan="2">ŋ</th>
+          <th>ng</th>
+          <th>2</th>
+          <th>ngaay</th>
+          <th>afternoon</th>
+        </tr>
+        <tr>
+          <th>ngh</th>
+          <th>1U</th>
+          <th>nghàam</th>
+          <th>a moment ago</th>
+        </tr>
+        <tr>
+          <th rowspan="2">w</th>
+          <th>w</th>
+          <th>2</th>
+          <th>waam</th>
+          <th>word</th>
+        </tr>
+        <tr>
+          <th>wh</th>
+          <th>1U</th>
+          <th>wha</th>
+          <th>flower</th>
+        </tr>
+        <tr>
+          <th>ˀw (ʋ)</th>
+          <th>qw</th>
+          <th>1G</th>
+          <th>qwa</th>
+          <th>rainbow</th>
+        </tr>
+        <tr>
+          <th rowspan="2">j</th>
+          <th>y</th>
+          <th>2</th>
+          <th>yaw</th>
+          <th>straight</th>
+        </tr>
+        <tr>
+          <th>yh</th>
+          <th>1U</th>
+          <th>yhaw</th>
+          <th>move slowly</th>
+        </tr>
+        <tr>
+          <th>ˀj (j)</th>
+          <th>qy</th>
+          <th>1G</th>
+          <th>qyòw</th>
+          <th>to be at</th>
+        </tr>
+        <tr>
+          <th>h</th>
+          <th>h</th>
+          <th>1A</th>
+          <th>há</th>
+          <th>five</th>
+        </tr>
+        <tr>
+          <th>ʔ</th>
+          <th>none</th>
+          <th>1G</th>
+          <th>aw</th>
+          <th>to get</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <hr />
+
+
+  <script src="js/vendor/modernizr-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.3.1.min.js"><\/script>')</script>
+  <script src="js/plugins.js"></script>
+  <script data-main="js/app" src="js/require.js"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+</body>
+
+</html>
